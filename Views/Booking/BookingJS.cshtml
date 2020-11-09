@@ -1,0 +1,214 @@
+﻿
+
+@{
+
+    var roomId = ViewBag.RoomId;
+
+
+    ViewData["Title"] = "Index";
+
+}
+
+
+<style type="text/css">
+        <!--
+        #Available {
+            background-color:greenyellow;
+            width: 250px;
+            padding: 25px;
+        }
+        #NotAvailable {
+        background-color: red;
+        width: 250px;
+        padding: 25px;
+        }
+        h1 {
+            font-size: 30px;
+            margin: 24px;
+        }
+
+        -->
+    </style>
+<h1>Booking</h1>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Namn:</dt>
+        <dd data-bind="text: name"></dd>
+    </dl>
+</div>
+<div data-bind="style: {backgroundColor: isBusy() == true ? 'red' : 'green', width: '200px',
+        padding: '25px'} ">
+    <div id="if-binding">
+        <p>
+            <span data-bind="if: isBusy">
+                <strong>Upptaget</strong><br />
+            </span><br />
+            <span data-bind="ifnot: isBusy">
+                <strong>Ledig</strong><br />
+            </span> 
+            <span data-bind="if: currentBooking() ==null">
+                <span><text>Ingen bokning finns</text></span>
+            </span>
+            <span data-bind="ifnot: currentBooking() == null">
+                <span><text>Ledig i <b data-bind="text: freeMinutesLeft()"></b> minuter</text></span>
+            </span>
+        </p>
+    </div>
+</div>
+
+<hr />
+<div id="if-binding">
+    <div data-bind="if: isBusy">
+        <div data-bind="whit: currentBooking()">
+            <h2>Bokad</h2>
+            <p>Rummet är bokad mellan: </p>
+            <h4><strong data-bind="text:start"></strong> - <strong data-bind="text:end"></strong></h4>
+
+            <button data-bind="click: removeBooking">Ångra bokning</button>
+        </div>
+    </div>
+    <div data-bind="ifnot: isBusy">
+        <h2>Snabb-boka</h2>
+        <button data-bind="click: create.bind($data, 'Thirty'), disabled: isDisabled">30 Minuter</button>
+        <button data-bind="click: create.bind($data, 'Sixty'), disabled: isDisabled">60 Minuter</button><br />
+        <button data-bind="click: create.bind($data, 'Ninety'), disabled: isDisabled">90 Minuter</button>
+        <button data-bind="click: create.bind($data, 'OneHundredTwenty'), disabled: isDisabled">120 Minuter</button>
+    </div>
+</div>
+<br />
+<h4>Kommande möten</h4>
+<table>
+    <thead>
+        <tr>
+            <th>Namn</th>
+            <th>Startar</th>
+            <th>Slutar</th>
+        </tr>
+    </thead>
+
+    <tbody data-bind="foreach: meetingOftoDay()">
+        <tr>
+            <td data-bind=" meetingOftoDay().UserName"></td>
+            <td data-bind=" meetingOftoDay().StartDate"></td>
+            <td data-bind=" meetingOftoDay().EndDate"></td>
+        </tr>
+ 
+    </tbody>
+</table>
+
+@section Scripts
+    {
+    <script type="text/javascript">
+        function Bookaroom() {
+            var self = this;
+            self.roomid = ko.observable(null);
+            self.name = ko.observable(null);
+            self.currentBooking = ko.observable([
+            ]);
+            self.bookings = ko.observableArray([]);
+            self.isBusy = ko.observable();
+            self.freeMinutesLeft = ko.observable();
+            self.meetingOftoDay = ko.observableArray([]);
+            self.isDisabled = ko.observable('false');
+            self.start = ko.observable();
+            self.end = ko.observable();
+             //Operations
+         
+
+           // Delete
+            self.removeBooking = function () {
+                if (confirm('Vill ni ångra bokningen??')) {
+                    var roomid = self.roomid();
+                    var bookId = self.currentBooking().Id;
+                    var data = ko.toJSON({"id" : bookId, "roomId": roomid});
+                    $.ajax({
+                        url: '@Url.Action("DeleteBooking")',
+                        cache: false,
+                        type: 'POST',
+                        contentType: 'application/json; charset=utf-8',
+                        data:data,
+                        success: function() {
+                           
+                            confirm("Bokningen är borttagen.");
+                            
+                            
+                        },
+                        error: function(err) {
+                            alert(err);
+                        }
+                    });
+                };
+                window.location.reload();
+            };
+            self.create = function (n) {
+                var self = this;
+                var minutesInt = 0;
+                var roomid = self.roomid();
+                if (n == 'Thirty') {
+                    minutesInt = 30;
+                    
+                }
+                else if (n == 'Sixty') {
+                    minutesInt = 60;
+                }
+                else if (n == 'Ninety') {
+                    minutesInt = 90;
+                }
+                else if (n == 'OneHundredTwenty') {
+                    minutesInt = 120;
+                }
+                else {
+                    alert('Bokningen är inte registrerad!!')
+                }
+               
+                var data = ko.toJSON({ "roomId": roomid, "minutes": minutesInt });
+
+                $.ajax({
+                    url: '@Url.Action("CreateSpeedBook")',
+                    cache: false,
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: data,
+                    seccess: function () {
+                        
+                        alert("Bokingen är registrerad!");
+                    },
+                    error: (function(err) {
+                        alert(err);
+                    })
+                });
+                window.location.reload();
+            };
+             self.loadData= function () {
+                var self = this;
+                 $.getJSON('@Url.Action("GetBookARoomJson", new { id = roomId })', function (b) {
+                     var parsed = JSON.parse(b);
+
+                     self.roomid(parsed.RoomId);
+                     self.name(parsed.Name);
+                     self.bookings(parsed.Bookings);
+                     self.isBusy(parsed.IsBusy);
+                     self.freeMinutesLeft(parsed.FreeMinutesLeft);
+                     self.currentBooking(parsed.CurrentBooking);
+                     self.meetingOftoDay(parsed.MeetingOftoDay);
+                     self.start(parsed.StartDate);
+                     self.end(parsed.EndDate);
+                     
+                 });
+                
+                
+            }
+        }
+
+        $(function () {
+            var viewModel = new Bookaroom();
+            ko.applyBindings(viewModel);
+            viewModel.loadData();
+        });
+        
+        
+
+    </script>
+}

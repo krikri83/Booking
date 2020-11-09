@@ -1,0 +1,149 @@
+﻿@model BookAroom
+@{
+    ViewData["Title"] = "Index";
+    bool HaveRoom = false;
+  
+    foreach (var items in Model.Bookings)
+    {
+        if (User.Identity.Name == items.UserName && items.StartDate >= DateTime.Now)
+        {
+            HaveRoom = true;
+        }
+       
+    }
+
+    
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+
+            <h1>Hej @User.Identity.Name</h1> <br /><br />
+            <hr />
+            <br />
+            <br />
+            @if (HaveRoom == false)
+            {
+                <div>
+                    <h3>Önskar du att boka ett rum?</h3><br />
+                    <p>
+                        <a asp-controller="Rooms" asp-action="Index">Boka</a>
+                    </p>
+
+                </div>
+            }
+            else
+            {
+                <div>
+                    <h3>Här ser du dina bokingar!</h3><br />
+                    <h4><a asp-controller="Rooms" asp-action="Index">Boka Ny Tid</a></h4><br />
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Name)
+                                </th>
+                                <th>
+                                    Datum
+                                </th>
+                                <th>
+                                    Tid
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Bookings)
+                            {
+                                @if (item.UserName == User.Identity.Name && item.StartDate >= DateTime.Now)
+                                {
+                                    <tr>
+                                        <td>
+                                           
+                                            @Html.DisplayFor(modelItem => item.Room.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.StartDate.Date) - @Html.DisplayFor(modelItem => item.EndDate.Date)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.StartDate.TimeOfDay) - @Html.DisplayFor(modelItem => item.EndDate.TimeOfDay)
+                                        </td>
+                                        <td>
+                                            <form asp-controller="Booking" asp-action="DeleteBooking">
+                                                <input type="hidden" value="@item.Id" name="Id" />
+                                                <input type="hidden" value="@item.RoomId" name="roomId" />
+                                                <input type="submit" value="Avboka" class="btn btn-default" />
+                                            </form>
+
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            @if (User.IsInRole("Admin"))
+            {
+                <div>
+                    <h3>Alla bokingar!</h3><br />
+                    <br />
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Name)
+                                </th>
+                                <th>
+                                    Datum
+                                </th>
+                                <th>
+                                    Tid
+                                </th>
+                                <th>Vem</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Bookings)
+                            {
+                                @if (item.StartDate >= DateTime.Now)
+                                {
+                                    <tr>
+                                        <td>
+                                            
+                                                @Html.DisplayFor(modelItem => item.Room.Name)
+                                            
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.StartDate.Date)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.StartDate.TimeOfDay) - @Html.DisplayFor(modelItem => item.EndDate.TimeOfDay)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.UserName)
+                                        </td>
+                                        <td>
+                                            <form asp-controller="Booking" asp-action="DeleteBooking">
+                                                <input type="hidden" value="@item.Id" name="Id" />
+                                                <input type="hidden" value="@item.RoomId" name="roomId" />
+                                                <input type="submit" value="Avboka" class="btn btn-default" />
+                                            </form>
+
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+
+        </div>
+    </div>
+</div>

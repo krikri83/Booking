@@ -1,0 +1,153 @@
+﻿@model Booking2.Models.BookAroom;
+
+@{
+    ViewData["Title"] = "Index";
+
+    var time = DateTime.Now;
+    var backgroundColor = "#FF0000";
+    var roomAvaible = "Upptaget";
+    if (Model.CurrentBooking == null)
+        {
+            roomAvaible = "Ledigt";
+            backgroundColor = "#2EFE2E";
+        }
+    }
+
+
+<style type="text/css">
+    <!--
+    .Available {
+        background-color: @backgroundColor;
+        width: 250px;
+        padding: 25px;
+    }
+
+    h1 {
+        font-size: 30px;
+        margin: 24px;
+    }
+
+    -->
+</style>
+@if (Model.Name == "Disk")
+{
+    <h2>Booking</h2>
+    <p>@time</p>
+    <div>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+        </dl>
+    </div>
+    <div class="Available">
+        <h1>@roomAvaible</h1>
+        <h5>
+            @if (Model.CurrentBooking == null)
+            {
+                <text>ingen bokning finns</text>
+            }
+            else
+            {
+                <text>Ledig i @Model.FreeMinutesLeft</text>
+            }
+        </h5>
+    </div>
+    @if (Model.GetIsBusy() == true)
+    {
+        <h1>Snabb-Bokad</h1>
+        <h4>
+
+            @foreach (var next in Model.MeetingOftoDay)
+            {
+                <text>@next.StartDate - @next.EndDate</text>
+            }
+        </h4>
+       
+        <form asp-action="Delete">
+            <input type="hidden" value="@Model.CurrentBooking.Id" name="Id" />
+            <input type="hidden" value="@Model.RoomId" name="roomId" />
+            <input type="submit" value="Ångra bokning" class="btn btn-default" />
+        </form>
+
+    }
+    else
+    {
+        <h4>Snabb-boka</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @if (Model.FreeMinutesLeft >= 30 || Model.FreeMinutesLeft == null)
+                {
+                    <a href="@Url.Action("SpeedBook", "Booking", new { minutes = SpeedbookingChoices.Thirty, roomId = Model.RoomId })" class="btn btn-default">30 min</a>
+                }
+                else
+                {
+                    <a href="#" class="btn btn-default disabled">30 min</a>
+                }
+            </dt>
+            <dd>
+                @if (Model.FreeMinutesLeft >= 60 || Model.FreeMinutesLeft == null)
+                {
+                    <a href="@Url.Action("SpeedBook", "Booking", new { minutes = SpeedbookingChoices.Sixty, roomId = Model.RoomId })" class="btn btn-default">60 min</a>
+                }
+                else
+                {
+                    <a href="#" class="btn btn-default disabled">60 min</a>
+                }
+            </dd>
+            <dt>
+                @if (Model.FreeMinutesLeft >= 90 || Model.FreeMinutesLeft == null)
+                {
+                    <a href="@Url.Action("SpeedBook", "Booking", new { minutes = SpeedbookingChoices.Ninety, roomId = Model.RoomId })" class="btn btn-default">90 min</a>
+                }
+                else
+                {
+                    <a href="#" class="btn btn-default disabled">90 min</a>
+                }
+            </dt>
+            <dd>
+                @if (Model.FreeMinutesLeft >= 120 || Model.FreeMinutesLeft == null)
+                {
+                    <a href="@Url.Action("SpeedBook", "Booking", new { minutes = SpeedbookingChoices.OneHundredTwenty, roomId = Model.RoomId })" class="btn btn-default">120 min</a>
+                }
+                else
+                {
+                    <a href="#" class="btn btn-default disabled">120 min</a>
+                }
+            </dd>
+        </dl>
+
+    }
+    <br />
+    <h4>Kommande möten</h4>
+    <h4>
+        @foreach (var next in Model.Bookings)
+        {
+            if (next.StartDate >= DateTime.Now)
+            {
+                <text>@next.StartDate - @next.EndDate  @next.UserName</text>
+            }
+
+        }
+    </h4>
+}
+else
+{
+    <h2>Booking</h2>
+    <div>
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+        </dl>
+        <h4>Går ej att snabb boka!</h4>
+    </div>
+}

@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Controllers",
+    "\\Data",
+    "\\Migrations",
+    "\\Views",
+    "\\Views\\Account"
+  ],
+  "SelectedNode": "\\Controllers\\BookingController.cs",
+  "PreviewInSolutionExplorer": false
+}

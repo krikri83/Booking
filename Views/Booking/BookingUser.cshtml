@@ -1,0 +1,95 @@
+﻿@model BookAroom;
+
+@{
+    ViewData["Title"] = "BookingUser";
+    var roomId = Model.RoomId;
+
+
+}
+<h2>Boka Rum</h2>
+
+<hr />
+<dl class="dl-horizontal">
+    <dt>
+        @Html.DisplayNameFor(model => model.Name)
+    </dt>
+    <dd>
+        @Html.DisplayFor(model => model.Name)
+    </dd>
+</dl>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        
+        <form asp-action="CreateBooking">
+
+            <div class="form-group">
+                <label for="from">När behöver du boka?  </label>
+                <input type="text" id="dateStart" name="StartDate" autocomplete="off" /><br />
+                <input type="text" id="timeStart" name="StartTime" autocomplete="off" /><br /><br />
+                <label for="Till">Tills när ? </label><br />
+                <input type="text" id="dateEnds" name="EndDate" autocomplete="off" />
+                <input type="text" id="timeEnds" name="EndTime" autocomplete="off" />
+
+            </div> <br />
+            <div class="form-group">
+                <input type="hidden" asp-for="@Model.RoomId" name="roomId" />
+                <input type="submit" value="boka" class="btn btn-default" />
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+
+    @section Scripts
+        {
+    <script>
+        $(document).ready (
+            function BookAroom() {
+                var events = [];
+                $.ajax
+                    ({
+                    type: "GET",
+                    url:'@Url.Action("GetBookingsForDateJson", new { id = roomId })',
+                    success: function (data)
+                    {
+                        var parsed = JSON.parse(data)
+                        for (var i = 0; i < parsed.Bookings.length; i++)
+                        {
+                            events.push([parsed.Bookings[i].StartDate, parsed.Bookings[i].EndDate]);
+                        }
+                        //$("#dateStart, #dateEnd").datepicker("refresh");
+                    },
+                    error: function (error)
+                    {
+                        alert("failed");
+                        console.log(error);
+                    }
+                    });
+
+                $("#dateStart, #dateEnds").datepicker({
+                    minDate: 0,
+                    dateFormat: 'dd-mm-yy',
+                   
+                });
+                $('#timeStart, #timeEnds').timepicker({
+                    scrollDefault: 'now',
+                    minTime: 'now',
+                    timeFormat: 'H:i',
+                    show2400: true,
+                    step: 30,
+                    dynamic: true
+                });
+
+               
+
+
+
+            });
+
+    </script>
+    }
+

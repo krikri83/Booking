@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <UserSecretsId>aspnet-Booking2-B37C5B78-E832-4AAA-9019-EF33134A09B3</UserSecretsId>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="cb.ko.binding.datetimepicker" Version="1.0.9" />
+    <PackageReference Include="jQuery" Version="3.3.1" />
+    <PackageReference Include="jQuery-datetimepicker" Version="2.4.5" />
+    <PackageReference Include="jQuery-Timepicker-Addon" Version="1.6.3" />
+    <PackageReference Include="jQuery.UI.Combined" Version="1.12.1" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.2" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>
